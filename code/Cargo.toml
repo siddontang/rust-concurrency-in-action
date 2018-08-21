@@ -1,0 +1,28 @@
+[package]
+name = "concurrency-in-action"
+version = "0.1.0"
+authors = ["siddontang <siddontang@gmail.com>"]
+
+[[example]]
+name = "atomic_seq_ordering"
+path = "examples/atomic_ordering/seq_ordering.rs"
+
+[[example]]
+name = "atomic_relaxed_ordering"
+path = "examples/atomic_ordering/relaxed_ordering.rs"
+
+[[example]]
+name = "atomic_acquire_release_ordering"
+path = "examples/atomic_ordering/acquire_release_ordering.rs"
+
+[[example]]
+name = "atomic_acquire_release_transitive"
+path = "examples/atomic_ordering/acquire_release_transitive.rs"
+
+[[example]]
+name = "atomic_fence"
+path = "examples/atomic_ordering/fence.rs"
+
+
+[dependencies]
+
