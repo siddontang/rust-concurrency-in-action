@@ -26,3 +26,7 @@ path = "examples/atomic_ordering/fence.rs"
 
 [dependencies]
 
+[dev-dependencies]
+num_cpus = "1.0"
+crossbeam = "0.4"
+
