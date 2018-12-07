@@ -5,12 +5,12 @@ use std::sync::{mpsc, Arc};
 use num_cpus;
 use test;
 
-mod condvar;
-mod crossbeam;
-mod robin_round;
-mod std_channel;
+pub mod condvar;
+pub mod crossbeam;
+pub mod robin_round;
+pub mod std_channel;
 
-mod util;
+pub mod util;
 
 use self::util::Spawner;
 
