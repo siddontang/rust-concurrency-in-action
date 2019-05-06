@@ -15,7 +15,7 @@ impl ThreadPool {
         for _ in 0..number {
             let rx = rx.clone();
             let handle = thread::spawn(move || {
-                while let Some(task) = rx.recv() {
+                while let Ok(task) = rx.recv() {
                     task.call_box();
                 }
             });

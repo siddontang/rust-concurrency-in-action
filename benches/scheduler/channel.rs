@@ -43,11 +43,13 @@ impl Latches {
 
         let front = latch.waiting.front().cloned();
         match front {
-            Some(cid) => if cid == who {
-                acquired = true;
-            } else {
-                latch.waiting.push_back(who);
-            },
+            Some(cid) => {
+                if cid == who {
+                    acquired = true;
+                } else {
+                    latch.waiting.push_back(who);
+                }
+            }
             None => {
                 latch.waiting.push_back(who);
                 acquired = true;
@@ -120,7 +122,7 @@ impl Scheduler {
     }
 
     pub fn run(&mut self) {
-        while let Some(res) = self.receiver.recv() {
+        while let Ok(res) = self.receiver.recv() {
             match res {
                 Cmd::Request { key, task } => {
                     let id = self.gen_id();

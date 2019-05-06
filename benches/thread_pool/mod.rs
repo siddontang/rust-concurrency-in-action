@@ -6,9 +6,11 @@ use num_cpus;
 use test;
 
 pub mod condvar;
+pub mod cpupool;
 pub mod crossbeam;
 pub mod robin_round;
 pub mod std_channel;
+pub mod tokio;
 
 pub mod util;
 
@@ -61,5 +63,17 @@ pub fn benchmark_condvar_thread_pool(b: &mut test::Bencher) {
 #[bench]
 pub fn benchmark_robin_round_thread_pool(b: &mut test::Bencher) {
     let pool = robin_round::ThreadPool::new(num_cpus::get());
+    benchmark_thread_pool(pool, b);
+}
+
+#[bench]
+pub fn benchmark_tokio_thread_pool(b: &mut test::Bencher) {
+    let pool = tokio::ThreadPool::new(num_cpus::get());
+    benchmark_thread_pool(pool, b);
+}
+
+#[bench]
+pub fn benchmark_cpu_pool(b: &mut test::Bencher) {
+    let pool = cpupool::ThreadPool::new(num_cpus::get());
     benchmark_thread_pool(pool, b);
 }
