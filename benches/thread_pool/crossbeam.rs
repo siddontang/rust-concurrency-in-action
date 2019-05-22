@@ -44,6 +44,6 @@ impl Drop for ThreadPool {
 
 impl Spawner for ThreadPool {
     fn spawn<T: FnOnce() + Send + 'static>(&self, t: T) {
-        self.tx.as_ref().unwrap().send(Box::new(t));
+        self.tx.as_ref().unwrap().send(Box::new(t)).unwrap();
     }
 }

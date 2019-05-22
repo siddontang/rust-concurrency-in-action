@@ -5,6 +5,7 @@ extern crate futures;
 extern crate futures_cpupool;
 extern crate fxhash;
 extern crate num_cpus;
+extern crate spin;
 extern crate test;
 extern crate tokio_threadpool;
 

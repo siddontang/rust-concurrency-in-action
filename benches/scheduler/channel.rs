@@ -6,6 +6,7 @@ pub use std::collections::hash_map::Entry as HashMapEntry;
 
 use crossbeam::channel::{self, Receiver, Sender};
 
+use scheduler::util::Runner;
 use thread_pool::crossbeam::ThreadPool;
 use thread_pool::util::{Spawner, Task};
 
@@ -89,6 +90,15 @@ impl TaskContext {
     }
 }
 
+impl Runner for Sender<Cmd> {
+    fn run(&self, key: usize, task: Task) {
+        self.send(Cmd::Request {
+            key: key,
+            task: task,
+        }).unwrap();
+    }
+}
+
 pub struct Scheduler {
     tasks: HashMap<usize, TaskContext>,
 
@@ -130,7 +140,7 @@ impl Scheduler {
                     self.tasks.insert(id, TaskContext::new(key, task));
                     if self.latches.acquire(key, id) {
                         self.pool.spawn(move || {
-                            sender.send(Cmd::Finished { key: key, who: id });
+                            sender.send(Cmd::Finished { key: key, who: id }).unwrap();
                         });
                     }
                 }
@@ -145,7 +155,7 @@ impl Scheduler {
                             sender.send(Cmd::Finished {
                                 key: pending_key,
                                 who: pending,
-                            });
+                            }).unwrap();
                         });
                     }
                 }

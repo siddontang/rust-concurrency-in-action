@@ -53,6 +53,6 @@ impl Spawner for ThreadPool {
         let n = self.count.fetch_add(1, Ordering::Relaxed);
         let txs = self.txs.as_ref().unwrap();
         let tx = txs.get(n % txs.len());
-        tx.as_ref().unwrap().send(Box::new(t));
+        tx.as_ref().unwrap().send(Box::new(t)).unwrap();
     }
 }

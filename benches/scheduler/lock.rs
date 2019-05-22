@@ -6,6 +6,7 @@ use std::usize;
 
 pub use fxhash::FxHashMap as HashMap;
 
+use scheduler::util::Runner;
 use thread_pool::crossbeam::ThreadPool;
 use thread_pool::util::{Spawner, Task};
 
@@ -84,8 +85,10 @@ impl Scheduler {
     fn gen_id(&self) -> usize {
         self.id_alloc.fetch_add(1, Relaxed)
     }
+}
 
-    pub fn run(&self, key: usize, task: Task) {
+impl Runner for Arc<Scheduler> {
+    fn run(&self, key: usize, task: Task) {
         let id = self.gen_id();
         let latches = self.latches.clone();
         if latches.acquire(key, id, task) {
