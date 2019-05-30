@@ -10,6 +10,7 @@ use num_cpus;
 mod channel;
 mod lock;
 mod spinlock;
+mod parking_lot;
 mod util;
 
 use self::util::Runner;
@@ -68,5 +69,11 @@ pub fn benchmark_scheduler_lock(b: &mut test::Bencher) {
 #[bench]
 pub fn benchmark_scheduler_spinlock(b: &mut test::Bencher) {
     let scheduler = Arc::new(spinlock::Scheduler::new(SLOT_NUM));
+    benchmark_scheduler(b, scheduler);
+}
+
+#[bench]
+pub fn benchmark_scheduler_parking_log(b: &mut test::Bencher) {
+    let scheduler = Arc::new(parking_lot::Scheduler::new(SLOT_NUM));
     benchmark_scheduler(b, scheduler);
 }
