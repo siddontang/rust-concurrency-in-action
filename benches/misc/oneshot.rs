@@ -1,5 +1,5 @@
 use test;
-
+use std::thread;
 use futures::sync::oneshot as FutureOneshot;
 use futures::{lazy, Future, future};
 use tokio_sync::oneshot as TokioOneshot;
@@ -7,6 +7,26 @@ use tokio_threadpool;
 
 #[bench]
 fn benchmark_future_oneshot(b: &mut test::Bencher) {
+    b.iter(move || {
+        let (tx, rx) = FutureOneshot::channel();
+
+        tx.send(1).unwrap();
+        rx.wait().unwrap();
+    });
+}
+
+#[bench]
+fn benchmark_tokio_oneshot(b: &mut test::Bencher) {
+    b.iter(move || {
+        let (tx, rx) = TokioOneshot::channel();
+
+        tx.send(1).unwrap();
+        rx.wait().unwrap();
+    });
+}
+
+#[bench]
+fn benchmark_future_oneshot_pool(b: &mut test::Bencher) {
     let pool = tokio_threadpool::Builder::new().pool_size(1).build();
     let sender = pool.sender();
 
@@ -25,7 +45,7 @@ fn benchmark_future_oneshot(b: &mut test::Bencher) {
 }
 
 #[bench]
-fn benchmark_tokio_oneshot(b: &mut test::Bencher) {
+fn benchmark_tokio_oneshot_pool(b: &mut test::Bencher) {
     let pool = tokio_threadpool::Builder::new().pool_size(1).build();
     let sender = pool.sender();
 
