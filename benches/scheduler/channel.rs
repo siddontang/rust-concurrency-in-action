@@ -95,7 +95,8 @@ impl Runner for Sender<Cmd> {
         self.send(Cmd::Request {
             key: key,
             task: task,
-        }).unwrap();
+        })
+        .unwrap();
     }
 }
 
@@ -152,10 +153,12 @@ impl Scheduler {
                         let pending_key = self.tasks.get(&pending).unwrap().key;
                         let sender = self.sender.clone();
                         self.pool.spawn(move || {
-                            sender.send(Cmd::Finished {
-                                key: pending_key,
-                                who: pending,
-                            }).unwrap();
+                            sender
+                                .send(Cmd::Finished {
+                                    key: pending_key,
+                                    who: pending,
+                                })
+                                .unwrap();
                         });
                     }
                 }

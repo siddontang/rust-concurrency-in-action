@@ -4,13 +4,13 @@ use std::sync::Arc;
 use std::thread;
 
 use crossbeam::channel::unbounded;
-use test;
 use num_cpus;
+use test;
 
 mod channel;
 mod lock;
-mod spinlock;
 mod parking_lot;
+mod spinlock;
 mod util;
 
 use self::util::Runner;
