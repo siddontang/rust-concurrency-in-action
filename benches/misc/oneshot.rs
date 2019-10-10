@@ -1,7 +1,7 @@
-use test;
-use std::thread;
 use futures::sync::oneshot as FutureOneshot;
-use futures::{lazy, Future, future};
+use futures::{future, lazy, Future};
+use std::thread;
+use test;
 use tokio_sync::oneshot as TokioOneshot;
 use tokio_threadpool;
 

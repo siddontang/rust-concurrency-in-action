@@ -16,10 +16,12 @@ impl ThreadPool {
         let arx = Arc::new(Mutex::new(rx));
         for _ in 0..number {
             let arx = arx.clone();
-            let handle = thread::spawn(move || {
-                while let Ok(task) = arx.lock().unwrap().recv() {
-                    task.call_box();
+            let handle = thread::spawn(move || loop {
+                let task = arx.lock().unwrap().recv();
+                if task.is_err() {
+                    break;
                 }
+                task.unwrap().call_box();
             });
 
             handlers.push(handle);
