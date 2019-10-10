@@ -33,10 +33,12 @@ fn benchmark_future_oneshot_pool(b: &mut test::Bencher) {
     b.iter(move || {
         let (tx, rx) = FutureOneshot::channel();
 
-        sender.spawn(lazy(|| {
-            tx.send(1).unwrap();
-            future::ok::<(), ()>(())
-        }));
+        sender
+            .spawn(lazy(|| {
+                tx.send(1).unwrap();
+                future::ok::<(), ()>(())
+            }))
+            .unwrap();
 
         rx.wait().unwrap();
     });
@@ -55,7 +57,7 @@ fn benchmark_tokio_oneshot_pool(b: &mut test::Bencher) {
         sender.spawn(lazy(|| {
             tx.send(1).unwrap();
             future::ok::<(), ()>(())
-        }));
+        })).unwrap();
 
         rx.wait().unwrap();
     });

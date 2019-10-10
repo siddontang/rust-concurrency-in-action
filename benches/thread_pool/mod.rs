@@ -1,6 +1,7 @@
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::SeqCst;
 use std::sync::{mpsc, Arc};
+use std::time::Duration;
 
 use num_cpus;
 use test;
@@ -55,8 +56,20 @@ pub fn benchmark_crossbeam_channel_thread_pool(b: &mut test::Bencher) {
 }
 
 #[bench]
+pub fn benchmark_crossbeam_channel_timeout_thread_pool(b: &mut test::Bencher) {
+    let pool = crossbeam::ThreadPool::new_with_timeout(num_cpus::get(), Some(Duration::from_secs(1)));
+    benchmark_thread_pool(pool, b);
+}
+
+#[bench]
 pub fn benchmark_condvar_thread_pool(b: &mut test::Bencher) {
-    let pool = condvar::ThreadPool::new(num_cpus::get());
+    let pool = condvar::ThreadPool::new(num_cpus::get(), None);
+    benchmark_thread_pool(pool, b);
+}
+
+#[bench]
+pub fn benchmark_condvar_timeout_thread_pool(b: &mut test::Bencher) {
+    let pool = condvar::ThreadPool::new(num_cpus::get(), Some(Duration::from_secs(1)));
     benchmark_thread_pool(pool, b);
 }
 

@@ -1,5 +1,6 @@
-use crossbeam::channel::{self, Sender};
+use crossbeam::channel::{self, RecvTimeoutError, Sender};
 use std::thread;
+use std::time::Duration;
 
 use thread_pool::util::{Spawner, Task};
 
@@ -9,14 +10,26 @@ pub struct ThreadPool {
 }
 impl ThreadPool {
     pub fn new(number: usize) -> ThreadPool {
+        ThreadPool::new_with_timeout(number, None)
+    }
+
+    pub fn new_with_timeout(number: usize, timeout: Option<Duration>) -> ThreadPool {
         let (tx, rx) = channel::unbounded::<Task>();
         let mut handlers = vec![];
 
         for _ in 0..number {
             let rx = rx.clone();
-            let handle = thread::spawn(move || {
-                while let Ok(task) = rx.recv() {
-                    task.call_box();
+            let handle = thread::spawn(move || loop {
+                match timeout {
+                    Some(t) => match rx.recv_timeout(t) {
+                        Ok(task) => task.call_box(),
+                        Err(RecvTimeoutError::Timeout) => {}
+                        Err(_) => break,
+                    },
+                    None => match rx.recv() {
+                        Ok(task) => task.call_box(),
+                        Err(_) => break,
+                    },
                 }
             });
 

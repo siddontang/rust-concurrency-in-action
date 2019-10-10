@@ -1,6 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Condvar, Mutex};
 use std::thread;
+use std::time::Duration;
 
 use thread_pool::util::{Spawner, Task};
 
@@ -14,7 +15,7 @@ pub struct ThreadPool {
     notifer: Arc<(Mutex<State>, Condvar)>,
 }
 
-fn next_task(notifer: &Arc<(Mutex<State>, Condvar)>) -> Option<Task> {
+fn next_task(notifer: &Arc<(Mutex<State>, Condvar)>, timeout: Option<Duration>) -> Option<Task> {
     let &(ref lock, ref cvar) = &**notifer;
     let mut state = lock.lock().unwrap();
     loop {
@@ -26,14 +27,17 @@ fn next_task(notifer: &Arc<(Mutex<State>, Condvar)>) -> Option<Task> {
                 return Some(t);
             }
             None => {
-                state = cvar.wait(state).unwrap();
+                state = match timeout {
+                    Some(t) => cvar.wait_timeout(state, t).unwrap().0,
+                    None => cvar.wait(state).unwrap(),
+                };
             }
         }
     }
 }
 
 impl ThreadPool {
-    pub fn new(number: usize) -> ThreadPool {
+    pub fn new(number: usize, timeout: Option<Duration>) -> ThreadPool {
         let mut handlers = vec![];
         let s = State {
             queue: VecDeque::with_capacity(1024),
@@ -43,7 +47,7 @@ impl ThreadPool {
         for _ in 0..number {
             let notifer = notifer.clone();
             let handle = thread::spawn(move || {
-                while let Some(task) = next_task(&notifer) {
+                while let Some(task) = next_task(&notifer, timeout) {
                     task.call_box();
                 }
             });
